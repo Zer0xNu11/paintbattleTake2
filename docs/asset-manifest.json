@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/paintbattleTake2/static/css/main.7e694d1f.css",
+    "main.js": "/paintbattleTake2/static/js/main.3491c8d3.js",
+    "static/js/453.9d0fcb41.chunk.js": "/paintbattleTake2/static/js/453.9d0fcb41.chunk.js",
+    "index.html": "/paintbattleTake2/index.html",
+    "main.7e694d1f.css.map": "/paintbattleTake2/static/css/main.7e694d1f.css.map",
+    "main.3491c8d3.js.map": "/paintbattleTake2/static/js/main.3491c8d3.js.map",
+    "453.9d0fcb41.chunk.js.map": "/paintbattleTake2/static/js/453.9d0fcb41.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7e694d1f.css",
+    "static/js/main.3491c8d3.js"
+  ]
+}
