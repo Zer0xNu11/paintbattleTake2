@@ -51,6 +51,7 @@ const Canvas = ({ userColor}) => {
         set(ref(db, 'sharedTimer/time'), 0);
         set(ref(db, 'sharedTimer/isRunning'), false);
         setIsChart(false);
+        setCountClick(0);
       })
       .catch(()=>{console.log('---EROOR  resetCanvas---')})
     
@@ -80,10 +81,36 @@ const Canvas = ({ userColor}) => {
   const width = 800;
   const height = 400;
 
-  const clickListener = () => {
-    setCountClick((prev) => prev + 1);
-  };
+  const rightClick = (e) =>{
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('==rightClicked==')
+    if(isPlaying === false){return}
+    if(isFinished === true){return}
+    if(countClick < 10){return}
+    playAudio();
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect(); //キャンバス要素の位置サイズを取得
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setCountClick(0);
 
+    const newCircle = { x, y, color: '#6C7180', radius: 80 }; //描画する円定義
+    setCircles((prevCircles) => [...circles, newCircle]);
+    push(drawingDataRef, newCircle);
+
+    const drawingDataListener = onChildAdded(drawingDataRef, (snapshot) => {
+      const newCircle = snapshot.val();
+      setCircles((prevCircles) => [...prevCircles, newCircle]);
+
+ 
+
+      return () => {
+        off(drawingDataRef, "child_added", drawingDataListener);
+      };
+    });
+  }
+  
   useEffect(()=>{
     const drawingDataListener = onChildAdded(drawingDataRef, (snapshot) => {
       const newCircle = snapshot.val();
@@ -98,20 +125,6 @@ const Canvas = ({ userColor}) => {
   useEffect(() => {
     console.log('---drawing---')
     console.log(`isPlaying = ${isPlaying}`)
-    // const canvas = canvasRef.current;
-    // const ctx = canvas.getContext("2d");
-
-    // const drawCircles = () => {
-    //   ctx.clearRect(0, 0, canvas.width, canvas.height); //初期化
-    //   circles.map(({ x, y, color, radius }) => {
-    //     //分割代入
-    //     ctx.beginPath();
-    //     ctx.arc(x, y, radius, 0, 2 * Math.PI);
-    //     ctx.fillStyle = color;
-    //     ctx.fill();
-    //     return null; // mapで何も返さない場合は、nullを返す
-    //   });
-    // };
 if(isPlaying){drawCircles();} //すべて描画し直している(circlesを再描画)
   console.log(`isFinished = ${isFinished}`)
      
@@ -119,7 +132,8 @@ if(isPlaying){drawCircles();} //すべて描画し直している(circlesを再�
 
   const mouseDown = (e) => {
     //座標の補正
-    
+    console.log(e);
+    if(e.button === 2){return}
     console.log("==mouseDown==");
     console.log(`isPlaying = ${isPlaying}`)
     if(isPlaying === false){return}
@@ -129,6 +143,9 @@ if(isPlaying){drawCircles();} //すべて描画し直している(circlesを再�
     const rect = canvas.getBoundingClientRect(); //キャンバス要素の位置サイズを取得
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+    if(countClick < 10){
+      setCountClick(countClick+1);
+    }
 
     const newCircle = { x, y, color: userColor, radius: 20 }; //描画する円定義
     setCircles((prevCircles) => [...circles, newCircle]);
@@ -220,13 +237,14 @@ useEffect(()=>{
   return (
     <div className="absolute  top-0 w-full">
  
-      <div className="flex items-center"><div className={css.selectColor}></div> <span className="text-black text-4xl">{'PaintBattle'}</span></div>
+      <div className="flex items-center"><div className={css.selectColor}></div> <span className="text-black text-4xl">{'PaintBattle'}</span><span className="ml-10 text-4xl">{countClick}</span></div>
       <canvas
         className="relative bg-gray-500 z-20 top-0 right-0 left-0 bottom-0 m-auto "
         width={width}
         height={height}
         ref={canvasRef}
         onMouseDown={mouseDown}
+        onContextMenu={rightClick}
       ></canvas>
 
       {/* <button
